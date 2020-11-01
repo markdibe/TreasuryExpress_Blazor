@@ -1,0 +1,8 @@
+C:\Users\lenovo\source\repos\TreasuryExpress\TreasuryExpress\Shared\bin\Debug\netstandard2.1\TreasuryExpress.Shared.deps.json
+C:\Users\lenovo\source\repos\TreasuryExpress\TreasuryExpress\Shared\bin\Debug\netstandard2.1\TreasuryExpress.Shared.dll
+C:\Users\lenovo\source\repos\TreasuryExpress\TreasuryExpress\Shared\bin\Debug\netstandard2.1\TreasuryExpress.Shared.pdb
+C:\Users\lenovo\source\repos\TreasuryExpress\TreasuryExpress\Shared\obj\Debug\netstandard2.1\TreasuryExpress.Shared.AssemblyInfoInputs.cache
+C:\Users\lenovo\source\repos\TreasuryExpress\TreasuryExpress\Shared\obj\Debug\netstandard2.1\TreasuryExpress.Shared.AssemblyInfo.cs
+C:\Users\lenovo\source\repos\TreasuryExpress\TreasuryExpress\Shared\obj\Debug\netstandard2.1\TreasuryExpress.Shared.csproj.CoreCompileInputs.cache
+C:\Users\lenovo\source\repos\TreasuryExpress\TreasuryExpress\Shared\obj\Debug\netstandard2.1\TreasuryExpress.Shared.dll
+C:\Users\lenovo\source\repos\TreasuryExpress\TreasuryExpress\Shared\obj\Debug\netstandard2.1\TreasuryExpress.Shared.pdb

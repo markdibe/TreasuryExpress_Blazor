@@ -1,0 +1,40 @@
+﻿@using TreasuryExpress.Shared;
+@inject HttpClient http;
+
+<li class="list-group-item active">
+    @if (balance == null || balance == default)
+    {
+        <span class="text-center oi oi-loop-circular"> </span>
+    }
+    else
+    {
+        <p class="text-center">@balance.BalanceAmount </p>
+        <p class="text-center">@balance.AccountNumber</p>
+    }
+</li>
+
+@code {
+    [Parameter]
+    public int AccountId { get; set; }
+
+    [Parameter]
+    public DateTime DayDate { get; set; }
+
+    private Balance balance { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        balance = new Balance();
+        await GetBalance();
+    }
+
+    private async Task GetBalance()
+    {
+        string d = DayDate.ToString("dd-MM-yyyy");
+        var result =  await http.GetFromJsonAsync<Balance>($"Balances/{AccountId}/{d}");
+        balance = result;
+    }
+
+}

@@ -1,0 +1,106 @@
+﻿@using TreasuryExpress.Shared;
+@inject HttpClient http;
+@inject IJSRuntime js;
+@if (accountList == null || accountList.Count <= 0)
+{
+    <center>...Loading ....</center>
+}
+else
+{
+    <div class="row">
+        <div class="col-12">
+            <table class="table table-striped w-100"  id="tbl_accounts">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th data-priority="1">Bank</th>
+                        <th>LBN</th>
+                        <th data-priority="2">IBAN</th>
+                        <th>Currency</th>
+                        <th data-priority="3"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (Account account in accountList)
+                    {
+                        <tr>
+                            <td>@account.AccountId</td>
+                            <td>@account.BankName</td>
+                            <td>@account.LocalAccountNumber</td>
+                            <td>@account.IBAN</td>
+                            <td>@account.Currency</td>
+                            <td>
+                                <a class="btn btn-primary oi oi-monitor" data-toggle="tooltip" title="Balance" href=@($"/balancemanager/{account.AccountId}")>
+
+                                </a>
+                                |
+                                <a class="btn btn-success oi oi-transfer" data-toggle="tooltip" title="Transactions" href=@($"/transactionmanager/{account.AccountId}")>
+
+                                </a>
+                                |
+                                <a class="btn btn-info oi oi-pencil" data-toggle="tooltip" title="Edit" @onclick="(()=> { HandleEditAccount(account); })">
+
+                                </a>
+                                |
+                                <a class="btn btn-danger oi oi-trash" data-toggle="tooltip" title="Delete" @onclick="(async()=> {await DeleteAccount(account.AccountId); })">
+
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+}
+
+@code {
+    [Parameter]
+    public EventCallback<Account> HandleEdit { get; set; }
+
+    private void HandleEditAccount(Account account)
+    {
+        HandleEdit.InvokeAsync(account);
+    }
+
+    private List<Account> accountList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await  base.OnInitializedAsync();
+        await GetAccounts();
+        //await js.InvokeVoidAsync("data_table_setting", "#tbl_accounts");
+    }
+
+    private async Task DeleteAccount(int AccountId)
+    {
+        //await js.InvokeVoidAsync("data_table_setting_remove", "#tbl_accounts");
+        var one = await http.DeleteAsync($"Accounts/{AccountId}");
+        if (one.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            List<Account> resultList = accountList.Where(x => x.AccountId != AccountId).ToList();
+            accountList = resultList;
+        }
+        //await js.InvokeVoidAsync("data_table_setting", "#tbl_accounts");
+    }
+
+    private async Task GetAccounts()
+    {
+        var listof =  http.GetFromJsonAsync<List<Account>>("Accounts");
+        var newAccountList =  await listof;
+        this.accountList = newAccountList;
+    }
+
+    public void HandleSaveAccount(Account _ac)
+    {
+        bool isExists = accountList.Any(x => x.AccountId == _ac.AccountId);
+        if (isExists)
+        {
+            Account oldAccount = accountList.FirstOrDefault(x => x.AccountId == _ac.AccountId);
+            accountList.Remove(oldAccount);
+        }
+        accountList.Add(_ac);
+        //js.InvokeVoidAsync("data_table_setting", "#tbl_accounts");
+    }
+}

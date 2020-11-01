@@ -1,0 +1,64 @@
+﻿@page "/transactionmanager/{accountId:int}";
+@using TreasuryExpress.Shared;
+@inject HttpClient http;
+@inject NavigationManager manager;
+
+@if (accountId != default)
+{
+<TransactionFormComponent @ref="transactionForm" AccountId="accountId" HandleChangeDate="HandleChangeDate" HandleSaveTransaction="HandleSaveTransaction"></TransactionFormComponent>
+<br />
+<TransactionListComponent @ref="transactionTable" AccountId="accountId" HandleEdit="HandleEdit"></TransactionListComponent>
+}
+else
+{
+    manager.NavigateTo("accountmanager");
+}
+
+
+
+
+
+
+
+@code{
+    #region normal Parameters
+    [Parameter]
+    public int accountId { get; set; }
+    #endregion
+
+    #region Object References
+    private TransactionFormComponent transactionForm;
+
+    private TransactionListComponent transactionTable;
+    #endregion
+
+    #region gathering event callback 
+    private async Task HandleChangeDate(DateTime transactionDate)
+    {
+        await transactionTable.FilterTransactions(transactionDate);
+    }
+
+    private void HandleSaveTransaction(Transaction transaction)
+    {
+        transactionTable.AddTransaction(transaction);
+    }
+
+    private Task HandleEdit(Transaction tr)
+    {
+        Task s = Task.Run(()=> transactionForm.Edit(tr));
+        return s;
+    }
+
+    #endregion
+
+
+    #region component lifecycle
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+    #endregion
+
+
+
+}

@@ -1,0 +1,22 @@
+﻿@page "/text";
+@using TreasuryExpress.Shared
+
+
+<div class="col-md-3 col-sm-6 m-1">
+    <ol class="list-group">
+        <li class="list-group-item  bg-custom text-white"># :@balance.AccountId</li>
+        <li class="list-group-item  bg-custom  text-white">num: @balance.AccountNumber</li>
+        <li class="list-group-item  bg-custom text-white">$: @balance.BalanceAmount</li>
+        <li class="list-group-item  bg-custom  text-white-50">date: @balance.BalanceDate</li>
+    </ol>
+</div>
+
+
+@code {
+    [Parameter]
+    public Balance balance { get; set; }
+
+    [Parameter]
+    public int order { get; set; }
+
+}

@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "NJE0CD2/riXjGJ3ih1r3XdcedK//hg2v3P8UrRJzdq0r3X/F7X8A9Dt52G7kB+bXWy0yw0dy6cZ5J0k1QL13qA==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\lenovo\\source\\repos\\TreasuryExpress\\TreasuryExpress\\Shared\\TreasuryExpress.Shared.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\lenovo\\.nuget\\packages\\system.componentmodel.annotations\\4.7.0\\system.componentmodel.annotations.4.7.0.nupkg.sha512"
+  ],
+  "logs": []
+}

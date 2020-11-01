@@ -1,0 +1,102 @@
+﻿@using TreasuryExpress.Shared;
+@inject HttpClient http;
+@inject IJSRuntime js;
+<div class="row">
+    <EditForm Model="transaction" OnValidSubmit="HandleSave" class="shadow p-3 m-2 col-12">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        <ValidationSummary></ValidationSummary>
+        <div class="row">
+            <div class="hidden">
+                <InputNumber class="hidden" @bind-Value="transaction.AccountId"></InputNumber>
+                <InputNumber class="hidden" @bind-Value="transaction.TransactionId"></InputNumber>
+            </div>
+            <div class="col-4">
+                <label class="col-form-label">Amount</label>
+                <InputNumber @bind-Value="transaction.TransactionAmount" class="form-control"></InputNumber>
+            </div>
+            <div class="col-4">
+                <label class="col-form-label">Date</label>
+                <InputDate class="form-control" @bind-Value="transaction.TransactionDate"></InputDate>
+            </div>
+            <div class="col-4">
+                <button class="btn btn-purp text-white float-right mt-5" type="submit">Save</button>
+                <button type="button" class="float-right btn btn-info mt-5 mr-2 ml-2" @onclick="HandleSelect"> Search</button>
+            </div>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    #region main object
+
+
+    private Transaction transaction { get; set; }
+    #endregion
+
+    #region event callback Parameters
+    [Parameter]
+    public EventCallback<Transaction> HandleSaveTransaction { get; set; }
+
+    [Parameter]
+    public EventCallback<DateTime> HandleChangeDate { get; set; }
+    #endregion
+
+
+    #region normal Parameters
+    [Parameter]
+    public int AccountId { get; set; }
+    #endregion
+
+    #region method delegation for event call back
+    private async Task HandleSave()
+    {
+        if (transaction.TransactionId == default)
+        {
+            await AddTransaction();
+            await HandleSaveTransaction.InvokeAsync(transaction);
+        }
+        else
+        {
+            await UpdateTransaction();
+            await HandleSaveTransaction.InvokeAsync(transaction);
+        }
+        transaction = new Transaction { AccountId = AccountId, TransactionDate = transaction.TransactionDate };
+    }
+
+    private async Task HandleSelect()
+    {
+        //await js.InvokeVoidAsync("alert", "handle select");
+        await HandleChangeDate.InvokeAsync(transaction.TransactionDate);
+    }
+    #endregion
+
+    #region component transaction method
+    private async Task AddTransaction()
+    {
+        var result = await http.PostAsJsonAsync<Transaction>("Transactions", transaction);
+        transaction = await result.Content.ReadFromJsonAsync<Transaction>();
+    }
+    private async Task UpdateTransaction()
+    {
+        var result  = await http.PutAsJsonAsync<Transaction>($"Transactions/{transaction.TransactionId}", transaction);
+        transaction = await result.Content.ReadFromJsonAsync<Transaction>();
+    }
+
+    public void Edit(Transaction tr)
+    {
+        //var result = await http.GetFromJsonAsync<Transaction>($"Transactions/{transactionId}");
+        transaction = tr;
+    }
+
+    #endregion
+
+
+    #region component lifecycle
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        transaction = new Transaction { AccountId = AccountId, TransactionDate = DateTime.Now };
+    }
+    #endregion
+
+}

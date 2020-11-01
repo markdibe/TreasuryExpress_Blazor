@@ -1,0 +1,33 @@
+﻿@page "/balancemanager/{accountId:int}";
+@using TreasuryExpress.Shared;
+@inject HttpClient http;
+
+<div class="row">
+
+        @foreach (Balance balance in balanceList)
+        {
+            <BalanceCardComponent balance="balance" ></BalanceCardComponent>
+        }
+    
+    </div>
+
+@code {
+    [Parameter]
+    public int accountId { get; set; }
+
+    private List<Balance> balanceList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        balanceList = new List<Balance>();
+        await GetBalances();
+    }
+
+    private async Task GetBalances()
+    {
+        var result=  await http.GetFromJsonAsync<List<Balance>>($"Balances/{accountId}");
+        balanceList = result;
+    }
+
+}

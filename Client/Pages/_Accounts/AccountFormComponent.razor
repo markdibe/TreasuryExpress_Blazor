@@ -1,0 +1,96 @@
+﻿@using TreasuryExpress.Shared;
+@inject HttpClient http;
+
+@if (account == null)
+{
+    <p>....loading....</p>
+}
+
+else
+{
+    <EditForm Model="account" OnValidSubmit="SaveAccount" class="shadow p-3 mb-5 bg-white rounded">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        <ValidationSummary></ValidationSummary>
+
+        <input type="hidden" @bind-value="account.AccountId" />
+        <div class="form-group row">
+            <label for="text" class="col-4 col-form-label">Bank Name</label>
+            <div class="col-8">
+                <InputText id="bank_name" name="bank_name" type="text" class="form-control" @bind-Value="account.BankName" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="text1" class="col-4 col-form-label">Local Account Number</label>
+            <div class="col-8">
+                <InputText id="local_account_number" name="local_account_number" type="text" class="form-control" @bind-Value="account.LocalAccountNumber" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="text2" class="col-4 col-form-label">IBAN</label>
+            <div class="col-8">
+                <InputText id="iban" name="iban" type="text" class="form-control" @bind-Value="account.IBAN" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="select" class="col-4 col-form-label">Currency</label>
+            <div class="col-8">
+                <InputSelect id="currency" name="currency" class="custom-select" @bind-Value="account.Currency">
+                   <option value="" disabled="disabled"></option>
+                    <option value="Dollar">Dollar</option>
+                    <option value="Euro">Euro</option>
+                    <option value="LBP">LBP</option>
+                </InputSelect>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="offset-4 col-8">
+                <button name="submit" type="submit" class="btn btn-purp text-white" title="Save" data-toggle="tooltip">
+                    Save
+                </button>
+            </div>
+        </div>
+    </EditForm>
+}
+
+
+@code {
+
+    private Account account;
+
+    [Parameter]
+    public EventCallback<Account> HandleSave { get; set; }
+
+    protected  override void OnInitialized()
+    {
+        base.OnInitialized();
+        account = new Account();
+    }
+
+    private async Task AddAccount()
+    {
+        HttpResponseMessage response;
+        if (account.AccountId != default)
+        {
+            response = await http.PutAsJsonAsync($"Accounts/{account.AccountId}", account);
+        }
+        else
+        {
+            response = await http.PostAsJsonAsync("Accounts", account);
+        }
+
+        account =  await response.Content.ReadFromJsonAsync<Account>();
+    }
+
+    private async Task SaveAccount()
+    {
+        Task accountadded = AddAccount();
+        await accountadded;
+        await HandleSave.InvokeAsync(account);
+        account = new Account();
+    }
+
+    public void Edit(Account Editaccount)
+    {
+        this.account = Editaccount;
+    }
+}

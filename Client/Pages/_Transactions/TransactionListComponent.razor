@@ -1,0 +1,105 @@
+﻿@using TreasuryExpress.Shared;
+@inject HttpClient http;
+
+
+@if (TransactionList != null)
+{
+    if (TransactionList.Count == 0)
+    {
+        <center>No data available</center>
+    }
+    else
+    {
+        <div class="row">
+            @{ DateTime dt = TransactionList.FirstOrDefault().TransactionDate.Date;}
+
+            @{ 
+                List<DateTime> DistinctDays = TransactionList.Select(x => x.TransactionDate.Date).Distinct().ToList();
+            }
+            @foreach(DateTime day in DistinctDays)
+            {
+                List<Transaction> TransactionsDay = TransactionList.Where(x => x.TransactionDate.Date == day).ToList();
+            <div class="col-md-4 col-lg-3 col-sm-6">
+                <ul>
+                    <OneBalanceComponent AccountId="AccountId" DayDate="day.Date"></OneBalanceComponent>
+                    @{
+
+                        foreach (Transaction tr in TransactionsDay)
+                        {
+                            
+                            <li class="list-group-item d-flex justify-content-between align-items-center" @onclick="(async()=> { await HandleEditTransaction(tr); })">
+                                                    <span class="accordion">@tr.TransactionDate.ToString("dd-MM-yyyy hh:mm")</span> 
+                                <span class="badge badge-primary badge-pill">
+                                    @tr.TransactionAmount
+                                </span>
+                            </li>
+                        }
+                    }
+                </ul>
+            </div>
+            }
+        </div>
+    }
+}
+
+
+@code {
+    #region normal Parameters
+
+    [Parameter]
+    public int AccountId { get; set; }
+
+    #endregion
+
+    #region main object
+    private List<Transaction> TransactionList;
+    #endregion
+
+    #region Event CallBack
+    [Parameter]
+    public EventCallback<Transaction> HandleEdit { get; set; }
+    #endregion
+
+    #region invoking delegations method
+
+    public async Task HandleEditTransaction(Transaction tr)
+    {
+        await HandleEdit.InvokeAsync(tr);
+    }
+    #endregion
+
+
+
+
+    #region component Methods
+    private async Task Delete(int transactionId)
+    {
+        await http.DeleteAsync($"Transactions/{transactionId}");
+    }
+
+    public async Task FilterTransactions(DateTime transactionDate)
+    {
+        TransactionList = new List<Transaction>();
+        var result = await http.GetFromJsonAsync<List<Transaction>>($"Transactions/{AccountId}/{transactionDate.ToString("dd-MM-yyyy")}");
+        TransactionList = result.OrderBy(x => x.TransactionDate).ToList();
+        //this.StateHasChanged();
+    }
+
+    public void AddTransaction(Transaction tr)
+    {
+        List<Transaction> updatedTransaction = TransactionList.Where(x => x.TransactionId != tr.TransactionId).ToList();
+        updatedTransaction.Add(tr);
+        TransactionList = updatedTransaction;
+        //this.StateHasChanged();
+    }
+
+    #endregion
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        TransactionList = new List<Transaction>();
+        await FilterTransactions(DateTime.Now);
+    }
+
+}

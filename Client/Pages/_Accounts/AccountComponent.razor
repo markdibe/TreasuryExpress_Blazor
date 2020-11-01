@@ -1,0 +1,49 @@
+﻿@page "/AccountManager";
+@page "/AccountManager/{AccountId:int}";
+
+@using TreasuryExpress.Shared;
+@inject HttpClient http;
+@inject IJSRuntime js;
+
+<AccountFormComponent HandleSave="HandleSaveAccount" @ref="accountForm"></AccountFormComponent>
+
+<hr />
+
+<AccountListComponent @ref="accountTable" HandleEdit="HandleEditAccount"></AccountListComponent>
+
+
+
+
+@code {
+
+    private AccountFormComponent accountForm;
+
+    private AccountListComponent accountTable;
+
+
+    [Parameter]
+    public int AccountId { get; set; }
+
+
+    private void HandleEditAccount(Account account)
+    {
+        accountForm.Edit(account);
+    }
+
+    private void HandleSaveAccount(Account _ac)
+    {
+        accountTable.HandleSaveAccount(_ac);
+    }
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+
+ 
+
+
+}
